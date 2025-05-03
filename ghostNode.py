@@ -78,7 +78,7 @@ async def ticket(ctx):
         description="Selecione abaixo o motivo do seu ticket:",
         color=discord.Color.blue()
     )
-    embed.set_image(url="https://imgur.com/a/5YPzcOU")
+    embed.set_image(url="https://i.imgur.com/opzZdBF.jpeg")
 
     await ctx.send(embed=embed, view=TicketView())
 
@@ -99,7 +99,7 @@ async def on_ready():
             description="Selecione abaixo o motivo do seu ticket:",
             color=discord.Color.blue()
         )
-        embed.set_image(url="https://i.imgur.com/qKHxZL2.png")  # personalize se quiser
+        embed.set_image(url="https://i.imgur.com/opzZdBF.jpeg")  # personalize se quiser
 
         await canal.send(embed=embed, view=TicketView())
     else:
