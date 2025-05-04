@@ -101,4 +101,4 @@ async def painel(ctx):
     embed.set_image(url="https://i.imgur.com/opzZdBF.jpeg")
     await ctx.send(embed=embed, view=PlanoView())
 
-bot.run(os.getenv("TOKEN"))
+bot.run(os.getenv("TOKEN_SYSTEMS"))
