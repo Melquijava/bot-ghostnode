@@ -25,7 +25,7 @@ LINK_MENSAL = "https://mpago.la/32iyiet"
 LINK_VITALICIO = "https://mpago.la/11LidBF"
 
 # Configurações de categoria e equipe
-CATEGORY_NAME = "🎫 Tickets"
+CATEGORY_NAME = "━━━━━━❰･ᴀᴛᴇɴᴅɪᴍᴇɴᴛᴏ･❱━━━━━"
 STAFF_ROLE_NAME = "ADMs"
 CODIGOS_FILE = "codigos_100k.json"
 
