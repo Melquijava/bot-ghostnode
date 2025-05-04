@@ -116,3 +116,5 @@ async def painel(ctx):
     await ctx.send(embed=embed, view=PlanoView())
 
 bot.run(TOKEN)
+print("🔍 Variáveis disponíveis:", dict(os.environ))
+print("📦 TOKEN_SYSTEMS:", os.getenv("TOKEN_SYSTEMS"))
