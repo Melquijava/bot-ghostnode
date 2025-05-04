@@ -21,8 +21,8 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Links dos planos
-LINK_MENSAL = "https://mpago.la/32iyiet"
-LINK_VITALICIO = "https://mpago.la/11LidBF"
+LINK_MENSAL = "https://pay.kirvano.com/2bf6b08a-c55f-4859-9638-b73bb8402156"
+LINK_VITALICIO = "https://pay.kirvano.com/028fb6ed-615b-4c8c-894d-17219dc417aa"
 
 # Configurações de categoria e equipe
 CATEGORY_NAME = "━━━━━━❰･ᴀᴛᴇɴᴅɪᴍᴇɴᴛᴏ･❱━━━━━"
