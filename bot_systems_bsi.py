@@ -118,3 +118,4 @@ async def painel(ctx):
 bot.run(TOKEN)
 print("🔍 Variáveis disponíveis:", dict(os.environ))
 print("📦 TOKEN_SYSTEMS:", os.getenv("TOKEN_SYSTEMS"))
+print("🔍 Railway detectou:", list(os.environ.keys()))
