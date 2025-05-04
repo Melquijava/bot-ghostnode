@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Valida a variável de ambiente
-TOKEN = os.getenv("TOKEN_SYSTEMS")
+TOKEN = os.getenv("TOKEN")
 if not TOKEN:
     raise ValueError("❌ A variável de ambiente 'TOKEN_SYSTEMS' não está definida!")
 
