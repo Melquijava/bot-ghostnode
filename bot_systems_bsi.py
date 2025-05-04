@@ -5,10 +5,10 @@ import json
 import os
 from dotenv import load_dotenv
 
-# Carrega as variáveis de ambiente (.env localmente, ignorado no Railway)
+# Carrega as variáveis do .env (funciona localmente, ignorado no Railway)
 load_dotenv()
 
-# Obtém o token do bot a partir da variável de ambiente
+# Valida a variável de ambiente
 TOKEN = os.getenv("TOKEN_SYSTEMS")
 if not TOKEN:
     raise ValueError("❌ A variável de ambiente 'TOKEN_SYSTEMS' não está definida!")
@@ -20,16 +20,14 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# LINKS dos planos
+# Links dos planos
 LINK_MENSAL = "https://mpago.la/32iyiet"
 LINK_VITALICIO = "https://mpago.la/11LidBF"
 
-# Nome da categoria onde os tickets vão ser criados
+# Configurações de categoria e equipe
 CATEGORY_NAME = "🎫 Tickets"
 STAFF_ROLE_NAME = "ADMs"
-
-# Arquivo com os códigos
-CODIGOS_FILE = "codigos.json"
+CODIGOS_FILE = "codigos_100k.json"
 
 class PlanoView(View):
     def __init__(self):
@@ -42,6 +40,7 @@ class PlanoView(View):
 async def on_ready():
     print(f"✅ Bot conectado como {bot.user}")
     bot.add_view(PlanoView())
+
     canal = bot.get_channel(1368291167854133358)
     if canal:
         embed = discord.Embed(
@@ -56,6 +55,7 @@ async def on_ready():
 async def on_interaction(interaction: discord.Interaction):
     guild = interaction.guild
     user = interaction.user
+
     categoria = discord.utils.get(guild.categories, name=CATEGORY_NAME)
     if not categoria:
         categoria = await guild.create_category(CATEGORY_NAME)
