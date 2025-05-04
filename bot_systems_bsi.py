@@ -1,0 +1,104 @@
+
+import discord
+from discord.ext import commands
+from discord.ui import View, Button
+import json
+import os
+
+intents = discord.Intents.default()
+intents.message_content = True
+intents.guilds = True
+intents.members = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+# LINKS dos planos
+LINK_MENSAL = "https://mpago.la/32iyiet"
+LINK_VITALICIO = "https://mpago.la/11LidBF"
+
+# Nome da categoria onde os tickets vão ser criados
+CATEGORY_NAME = "🎫 Tickets"
+STAFF_ROLE_NAME = "ADMs"
+
+CODIGOS_FILE = "codigos.json"
+
+class PlanoView(View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.add_item(Button(label="🧾 Plano Mensal", style=discord.ButtonStyle.primary, custom_id="comprar_mensal"))
+        self.add_item(Button(label="💎 Plano Vitalício", style=discord.ButtonStyle.success, custom_id="comprar_vitalicio"))
+        self.add_item(Button(label="🆘 Suporte", style=discord.ButtonStyle.secondary, custom_id="suporte"))
+
+@bot.event
+async def on_ready():
+    print(f"Bot conectado como {bot.user}")
+    bot.add_view(PlanoView())
+    canal = bot.get_channel(1368291167854133358)
+    if canal:
+        embed = discord.Embed(
+            title="🎟️ Central de Acesso - Systems_BSI",
+            description="Escolha seu plano ou peça suporte:",
+            color=discord.Color.blue()
+        )
+        embed.set_image(url="https://i.imgur.com/opzZdBF.jpeg")
+        await canal.send(embed=embed, view=PlanoView())
+
+@bot.event
+async def on_interaction(interaction: discord.Interaction):
+    guild = interaction.guild
+    user = interaction.user
+    categoria = discord.utils.get(guild.categories, name=CATEGORY_NAME)
+    if not categoria:
+        categoria = await guild.create_category(CATEGORY_NAME)
+
+    staff_role = discord.utils.get(guild.roles, name=STAFF_ROLE_NAME)
+    overwrites = {
+        guild.default_role: discord.PermissionOverwrite(read_messages=False),
+        user: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+    }
+    if staff_role:
+        overwrites[staff_role] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
+
+    if interaction.data["custom_id"] == "suporte":
+        canal = await guild.create_text_channel(f"suporte-{user.name}", category=categoria, overwrites=overwrites)
+        await canal.send(f"{user.mention}, este é seu canal de suporte. A equipe irá te responder em breve.")
+        await interaction.response.send_message(f"✅ Canal de suporte criado: {canal.mention}", ephemeral=True)
+        return
+
+    if interaction.data["custom_id"] in ["comprar_mensal", "comprar_vitalicio"]:
+        tipo = "mensal" if interaction.data["custom_id"] == "comprar_mensal" else "vitalicio"
+        link = LINK_MENSAL if tipo == "mensal" else LINK_VITALICIO
+        with open(CODIGOS_FILE, "r") as f:
+            data = json.load(f)
+
+        if not data[tipo]:
+            await interaction.response.send_message("❌ Nenhum código disponível no momento. Contate o suporte.", ephemeral=True)
+            return
+
+        codigo = data[tipo].pop(0)
+        with open(CODIGOS_FILE, "w") as f:
+            json.dump(data, f, indent=2)
+
+        canal = await guild.create_text_channel(f"{tipo}-{user.name}", category=categoria, overwrites=overwrites)
+        await canal.send(
+            f"Olá {user.mention}, para acessar o servidor **GhostNode**, realize o pagamento no link abaixo:"
+            
+            f"👉 {link}"
+            
+            f"Após o pagamento, use este código no servidor GhostNode para liberar o acesso:"
+            
+            f"🔐 Código: `{codigo}`"
+        )
+        await interaction.response.send_message(f"✅ Ticket criado com código de acesso: {canal.mention}", ephemeral=True)
+
+@bot.command()
+async def painel(ctx):
+    embed = discord.Embed(
+        title="🎟️ Central de Acesso - Systems_BSI",
+        description="Escolha seu plano ou peça suporte:",
+        color=discord.Color.blue()
+    )
+    embed.set_image(url="https://i.imgur.com/opzZdBF.jpeg")
+    await ctx.send(embed=embed, view=PlanoView())
+
+bot.run(os.getenv("TOKEN"))
