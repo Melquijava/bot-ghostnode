@@ -1,9 +1,17 @@
-
 import discord
 from discord.ext import commands
 from discord.ui import View, Button
 import json
 import os
+from dotenv import load_dotenv
+
+# Carrega as variáveis de ambiente (.env localmente, ignorado no Railway)
+load_dotenv()
+
+# Obtém o token do bot a partir da variável de ambiente
+TOKEN = os.getenv("TOKEN_SYSTEMS")
+if not TOKEN:
+    raise ValueError("❌ A variável de ambiente 'TOKEN_SYSTEMS' não está definida!")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -20,6 +28,7 @@ LINK_VITALICIO = "https://mpago.la/11LidBF"
 CATEGORY_NAME = "🎫 Tickets"
 STAFF_ROLE_NAME = "ADMs"
 
+# Arquivo com os códigos
 CODIGOS_FILE = "codigos.json"
 
 class PlanoView(View):
@@ -31,7 +40,7 @@ class PlanoView(View):
 
 @bot.event
 async def on_ready():
-    print(f"Bot conectado como {bot.user}")
+    print(f"✅ Bot conectado como {bot.user}")
     bot.add_view(PlanoView())
     canal = bot.get_channel(1368291167854133358)
     if canal:
@@ -59,19 +68,26 @@ async def on_interaction(interaction: discord.Interaction):
     if staff_role:
         overwrites[staff_role] = discord.PermissionOverwrite(read_messages=True, send_messages=True)
 
-    if interaction.data["custom_id"] == "suporte":
+    custom_id = interaction.data["custom_id"]
+
+    if custom_id == "suporte":
         canal = await guild.create_text_channel(f"suporte-{user.name}", category=categoria, overwrites=overwrites)
         await canal.send(f"{user.mention}, este é seu canal de suporte. A equipe irá te responder em breve.")
         await interaction.response.send_message(f"✅ Canal de suporte criado: {canal.mention}", ephemeral=True)
         return
 
-    if interaction.data["custom_id"] in ["comprar_mensal", "comprar_vitalicio"]:
-        tipo = "mensal" if interaction.data["custom_id"] == "comprar_mensal" else "vitalicio"
+    if custom_id in ["comprar_mensal", "comprar_vitalicio"]:
+        tipo = "mensal" if custom_id == "comprar_mensal" else "vitalicio"
         link = LINK_MENSAL if tipo == "mensal" else LINK_VITALICIO
-        with open(CODIGOS_FILE, "r") as f:
-            data = json.load(f)
 
-        if not data[tipo]:
+        try:
+            with open(CODIGOS_FILE, "r") as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            await interaction.response.send_message("❌ O arquivo de códigos não foi encontrado.", ephemeral=True)
+            return
+
+        if not data.get(tipo):
             await interaction.response.send_message("❌ Nenhum código disponível no momento. Contate o suporte.", ephemeral=True)
             return
 
@@ -81,12 +97,10 @@ async def on_interaction(interaction: discord.Interaction):
 
         canal = await guild.create_text_channel(f"{tipo}-{user.name}", category=categoria, overwrites=overwrites)
         await canal.send(
-            f"Olá {user.mention}, para acessar o servidor **GhostNode**, realize o pagamento no link abaixo:"
-            
-            f"👉 {link}"
-            
-            f"Após o pagamento, use este código no servidor GhostNode para liberar o acesso:"
-            
+            f"👋 Olá {user.mention}!\n\n"
+            f"Para acessar o servidor **GhostNode**, realize o pagamento no link abaixo:\n"
+            f"👉 {link}\n\n"
+            f"Após o pagamento, use este código no servidor GhostNode para liberar o acesso:\n"
             f"🔐 Código: `{codigo}`"
         )
         await interaction.response.send_message(f"✅ Ticket criado com código de acesso: {canal.mention}", ephemeral=True)
@@ -101,4 +115,4 @@ async def painel(ctx):
     embed.set_image(url="https://i.imgur.com/opzZdBF.jpeg")
     await ctx.send(embed=embed, view=PlanoView())
 
-bot.run(os.getenv("TOKEN_SYSTEMS"))
+bot.run(TOKEN)
