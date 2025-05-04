@@ -11,7 +11,7 @@ load_dotenv()
 # Valida a variável de ambiente
 TOKEN = os.getenv("TOKEN")
 if not TOKEN:
-    raise ValueError("❌ A variável de ambiente 'TOKEN_SYSTEMS' não está definida!")
+    raise ValueError("❌ A variável de ambiente 'TOKEN' não está definida!")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -117,5 +117,5 @@ async def painel(ctx):
 
 bot.run(TOKEN)
 print("🔍 Variáveis disponíveis:", dict(os.environ))
-print("📦 TOKEN_SYSTEMS:", os.getenv("TOKEN_SYSTEMS"))
+print("📦 TOKEN:", os.getenv("TOKEN"))
 print("🔍 Railway detectou:", list(os.environ.keys()))
