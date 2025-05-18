@@ -72,7 +72,15 @@ async def on_interaction(interaction: discord.Interaction):
     custom_id = interaction.data["custom_id"]
 
     if custom_id == "suporte":
-        canal = await guild.create_text_channel(f"suporte-{user.name}", category=categoria, overwrites=overwrites)
+        nome_canal = f"suporte-{user.name}".replace(" ", "-").lower()
+        canal_existente = discord.utils.get(guild.text_channels, name=nome_canal)
+
+        if canal_existente:
+            await interaction.response.send_message(f"⚠️ Você já possui um canal de suporte aberto: {canal_existente.mention}", ephemeral=True)
+            return
+
+        canal = await guild.create_text_channel(nome_canal, category=categoria, overwrites=overwrites)
+
         await canal.send(f"{user.mention}, este é seu canal de suporte. A equipe irá te responder em breve.")
         await interaction.response.send_message(f"✅ Canal de suporte criado: {canal.mention}", ephemeral=True)
         return
@@ -81,7 +89,15 @@ async def on_interaction(interaction: discord.Interaction):
         tipo = "mensal" if custom_id == "comprar_mensal" else "vitalicio"
         link = LINK_MENSAL if tipo == "mensal" else LINK_VITALICIO
 
-        canal = await guild.create_text_channel(f"{tipo}-{user.name}", category=categoria, overwrites=overwrites)
+        nome_canal = f"{tipo}-{user.name}".replace(" ", "-").lower()
+        canal_existente = discord.utils.get(guild.text_channels, name=nome_canal)
+
+        if canal_existente:
+            await interaction.response.send_message(f"⚠️ Você já possui um ticket aberto: {canal_existente.mention}", ephemeral=True)
+            return
+
+        canal = await guild.create_text_channel(nome_canal, category=categoria, overwrites=overwrites)
+
         await asyncio.sleep(1)
 
         comprovante_canal = discord.utils.get(guild.text_channels, name=CANAL_ENVIO_COMPROVANTE)
