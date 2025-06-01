@@ -1,1 +1,0 @@
-worker: python bot_systems_bsi.py
